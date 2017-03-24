@@ -21,15 +21,15 @@ of incrementing the integer stored in the ref. What is an appropriate
 type for the return value? What should the type for the function as a
 whole be? *)
 
-   
+
 (* Now implement the function. (As usual, for this and succeeding
 exercises, you shouldn't feel beholden to how the definition is
 introduced in the skeleton code below. For instance, you might want to
 add a "rec", or use a different argument list, or no argument list at
 all but binding to an anonymous function instead.) *)
 
-let inc _ =
-  failwith "inc not implemented" ;;
+let inc (iref : int ref) : unit =
+  iref := !iref + 1;;
 
 (* Write a function named remember that returns the last string that
 it was called with. The first time it is called, it should return the
@@ -49,8 +49,13 @@ This is probably the least functional function ever written.
 As usual, you shouldn't feel beholden to how the definition is
 introduced in the skeleton code below. *)
 
-let remember _ = 
-  failwith "remember not implemented" ;;
+let remember =
+  let save = ref "" in
+  fun (str)->
+    let pr = !save in
+    save := str;
+    pr;;
+
 
 (*====================================================================
 Part 2: Gensym
@@ -91,7 +96,7 @@ Complete the implementation of gensym. As usual, you shouldn't feel
 beholden to how the definition is introduced in the skeleton code
 below. (We'll stop mentioning this now.) *)
 
-let gensym (s : string) : string = 
+let gensym (s : string) : string =
   failwith "gensym not implemented" ;;
 
 (*====================================================================
@@ -99,8 +104,8 @@ Part 3: Appending mutable lists
 
 Recall the definition of the mutable list type from lecture: *)
 
-type 'a mlist = 
-  | Nil 
+type 'a mlist =
+  | Nil
   | Cons of 'a * ('a mlist ref) ;;
 
 (* Mutable lists are just like regular lists, except that the tail of
@@ -134,7 +139,7 @@ slides.
 
  *)
 
-let length (m : 'a mlist) : int = 
+let length (m : 'a mlist) : int =
   failwith "length not implemented" ;;
 
 (* What is the time complexity of the length function in O() notation
@@ -184,7 +189,7 @@ Cons (1,
           {contents = Cons (5, {contents = Cons (6, {contents = Nil})})})})})})
  *)
 
-let mappend _ = 
+let mappend _ =
   failwith "mappend not implemented" ;;
 
 (* What happens when you evaluate the following expressions
@@ -257,25 +262,25 @@ module MakeImpQueue (A : sig type t
     type elt = A.t
     type mlist = Nil | Cons of elt * (mlist ref)
     type queue = {front: mlist ref ; rear: mlist ref}
-    let empty () = {front = ref Nil; rear = ref Nil} 
-    let enq x q = 
+    let empty () = {front = ref Nil; rear = ref Nil}
+    let enq x q =
       match !(q.rear) with
       | Cons (_h, t) -> assert (!t = Nil);
                         t := Cons(x, ref Nil);
                         q.rear := !t
-      | Nil -> assert (!(q.front) = Nil); 
+      | Nil -> assert (!(q.front) = Nil);
                q.front := Cons(x, ref Nil);
                q.rear := !(q.front)
-    let deq q = 
+    let deq q =
       match !(q.front) with
-      | Cons (h, t) -> 
+      | Cons (h, t) ->
          q.front := !t ;
          (match !t with
           | Nil -> q.rear := Nil
-          | Cons(_, _) -> ()); 
+          | Cons(_, _) -> ());
          Some h
       | Nil -> None
-    let to_string q = 
+    let to_string q =
       failwith "to_string not implemented"
   end ;;
 
@@ -292,7 +297,7 @@ module IntQueue = MakeImpQueue (struct
 the queue to a string to make sure that the right elements are in
 there. *)
 
-let test () = 
+let test () =
   let open IntQueue in
   let q = empty () in
   enq 1 q;
@@ -300,7 +305,7 @@ let test () =
   enq 3 q;
   to_string q ;;
 
-(* Running the test function should have the following behavior: 
+(* Running the test function should have the following behavior:
 
 # test () ;;
 - : bytes = "1 -> 2 -> 3 -> ||"
