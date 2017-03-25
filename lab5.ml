@@ -298,7 +298,7 @@ module MakeImpQueue (A : sig type t
     let to_string q =
       let {front; rear} = q in
       if !front = Nil && !rear = Nil
-      then ""
+      then "||"
       else
         let rec to_string' r =
           match !r with
