@@ -197,7 +197,7 @@ Cons (1,
 
 let mappend (xs : 'a mlist) (ys : 'a mlist) : unit =
     if xs = Nil
-    then raise Exit
+    then ()
     else
       let rec mappend' (Cons(_, t) : 'a mlist) : unit =
         match !t with
@@ -298,7 +298,7 @@ module MakeImpQueue (A : sig type t
     let to_string q =
       let {front; rear} = q in
       if !front = Nil && !rear = Nil
-      then "The queue is empty."
+      then ""
       else
         let rec to_string' r =
           match !r with
