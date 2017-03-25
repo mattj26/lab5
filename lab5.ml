@@ -205,15 +205,6 @@ let mappend (xs : 'a mlist) (ys : 'a mlist) : unit =
         | Cons (_, t) -> mappend' !t in
         mappend' xs;;
 
-
-
-
-
-
-
-
-
-
 (* What happens when you evaluate the following expressions
 sequentially in order?
 
@@ -224,6 +215,7 @@ sequentially in order?
 
 Do you understand what's going on?
  *)
+
 (*  The end of m refers to the beginning of m, so the list is like
     an infinite loop.  *)
 (*====================================================================
@@ -304,7 +296,15 @@ module MakeImpQueue (A : sig type t
          Some h
       | Nil -> None
     let to_string q =
-      failwith "to_string not implemented"
+      let {front; rear} = q in
+      if !front = Nil && !rear = Nil
+      then "The queue is empty."
+      else
+        let rec to_string' r =
+          match !r with
+          | Nil -> "||"
+          | Cons (h, t) -> A.to_string h ^ " -> " ^ to_string' t in
+      to_string' front
   end ;;
 
 (* To build an imperative queue, we apply the functor to an
@@ -327,6 +327,17 @@ let test () =
   enq 2 q;
   enq 3 q;
   to_string q ;;
+
+let test2 () =
+  let open IntQueue in
+  let q = empty () in
+  enq 3 q;
+  enq 5 q;
+  ignore (deq q);
+  enq 8 q;
+  enq 10 q;
+  ignore (deq q);
+  to_string q;
 
 (* Running the test function should have the following behavior:
 
