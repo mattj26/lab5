@@ -199,10 +199,11 @@ let mappend (xs : 'a mlist) (ys : 'a mlist) : unit =
     if xs = Nil
     then ()
     else
-      let rec mappend' (Cons(_, t) : 'a mlist) : unit =
-        match !t with
-        | Nil -> t := ys
-        | Cons (_, t) -> mappend' !t in
+      let rec mappend' (x : 'a mlist) : unit =
+        let Cons (_, rest) = x in
+        match !rest with
+        | Nil -> rest := ys
+        | Cons _ -> mappend' !rest in
         mappend' xs;;
 
 (* What happens when you evaluate the following expressions
