@@ -96,8 +96,12 @@ Complete the implementation of gensym. As usual, you shouldn't feel
 beholden to how the definition is introduced in the skeleton code
 below. (We'll stop mentioning this now.) *)
 
-let gensym (s : string) : string =
-  failwith "gensym not implemented" ;;
+let gensym =
+  let count = ref 0 in
+  fun (str) ->
+    let save = !count in
+    count := !count + 1;
+    str ^ string_of_int save;;
 
 (*====================================================================
 Part 3: Appending mutable lists
@@ -126,7 +130,7 @@ val ys : int mlist =
  *)
 
 let mlist_of_list (lst : 'a list) : 'a mlist =
-  failwith "mlist_of_list not implemented" ;;
+  List.fold_right (fun h t -> Cons (h, ref t)) lst Nil;;
 
 (* Define a function length to compute the length of an mlist. Try to
 do this without looking at the solution that is given in the lecture
@@ -139,12 +143,14 @@ slides.
 
  *)
 
-let length (m : 'a mlist) : int =
-  failwith "length not implemented" ;;
+let rec length (m : 'a mlist) : int =
+  match m with
+  | Nil -> 0
+  | Cons (_, t) -> 1 + length !t;;
 
 (* What is the time complexity of the length function in O() notation
 in terms of the length of its list argument? *)
-
+(*  O(n)                     *)
 
 (* Now, define a function mappend that takes a *non-empty* mutable
 list and a second mutable list and, as a side effect, causes the first
@@ -189,8 +195,24 @@ Cons (1,
           {contents = Cons (5, {contents = Cons (6, {contents = Nil})})})})})})
  *)
 
-let mappend _ =
-  failwith "mappend not implemented" ;;
+let mappend (xs : 'a mlist) (ys : 'a mlist) : unit =
+    if xs = Nil
+    then raise Exit
+    else
+      let rec mappend' (Cons(_, t) : 'a mlist) : unit =
+        match !t with
+        | Nil -> t := ys
+        | Cons (_, t) -> mappend' !t in
+        mappend' xs;;
+
+
+
+
+
+
+
+
+
 
 (* What happens when you evaluate the following expressions
 sequentially in order?
@@ -202,7 +224,8 @@ sequentially in order?
 
 Do you understand what's going on?
  *)
-
+(*  The end of m refers to the beginning of m, so the list is like
+    an infinite loop.  *)
 (*====================================================================
 Part 4: Adding serialization to imperative queues
 
